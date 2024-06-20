@@ -1,7 +1,8 @@
 <?php
 
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\TestModel;
+use Illuminate\Support\Facades\Route;
+use NadLambino\QueryBuilder\QueryBuilder;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\TestModel;
 
 it('can instantiate the query builder and filter the query for an actual api request', function () {
     TestModel::factory()->create();

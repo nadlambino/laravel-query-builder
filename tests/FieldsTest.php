@@ -2,12 +2,12 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Spatie\QueryBuilder\Exceptions\AllowedFieldsMustBeCalledBeforeAllowedIncludes;
-use Spatie\QueryBuilder\Exceptions\InvalidFieldQuery;
-use Spatie\QueryBuilder\Exceptions\UnknownIncludedFieldsQuery;
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\RelatedModel;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\TestModel;
+use NadLambino\QueryBuilder\Exceptions\AllowedFieldsMustBeCalledBeforeAllowedIncludes;
+use NadLambino\QueryBuilder\Exceptions\InvalidFieldQuery;
+use NadLambino\QueryBuilder\Exceptions\UnknownIncludedFieldsQuery;
+use NadLambino\QueryBuilder\QueryBuilder;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\RelatedModel;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\TestModel;
 
 beforeEach(function () {
     $this->model = TestModel::factory()->create();

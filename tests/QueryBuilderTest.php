@@ -2,14 +2,14 @@
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\QueryBuilderRequest;
-use Spatie\QueryBuilder\Sorts\Sort;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\NestedRelatedModel;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\RelatedThroughPivotModel;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\ScopeModel;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\SoftDeleteModel;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\TestModel;
+use NadLambino\QueryBuilder\QueryBuilder;
+use NadLambino\QueryBuilder\Sorts\Sort;
+use NadLambino\QueryBuilder\Sources\RequestSource;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\NestedRelatedModel;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\RelatedThroughPivotModel;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\ScopeModel;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\SoftDeleteModel;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\TestModel;
 
 it('can be given an eloquent query using where', function () {
     $queryBuilder = QueryBuilder::for(TestModel::where('id', 1));
@@ -81,14 +81,14 @@ it('can not be given an object that is neither relation nor eloquent builder', f
 
 it('will determine the request when its not given', function () {
     $builderReflection = new ReflectionClass(QueryBuilder::class);
-    $requestProperty = $builderReflection->getProperty('request');
+    $requestProperty = $builderReflection->getProperty('source');
     $requestProperty->setAccessible(true);
 
     $this->getJson('/test-model?sort=name');
 
     $builder = QueryBuilder::for(TestModel::class);
 
-    expect($requestProperty->getValue($builder))->toBeInstanceOf(QueryBuilderRequest::class);
+    expect($requestProperty->getValue($builder))->toBeInstanceOf(RequestSource::class);
     expect($requestProperty->getValue($builder)->sorts()->toArray())->toEqual(['name']);
 });
 
@@ -181,13 +181,13 @@ it('executes the same query regardless of the order of applied filters or sorts'
     ]);
 
     $usingSortFirst = QueryBuilder::for(TestModel::class, $req)
-        ->allowedSorts(\Spatie\QueryBuilder\AllowedSort::custom('name', $customSort))
+        ->allowedSorts(\NadLambino\QueryBuilder\AllowedSort::custom('name', $customSort))
         ->allowedFilters('name')
         ->toSql();
 
     $usingFilterFirst = QueryBuilder::for(TestModel::class, $req)
         ->allowedFilters('name')
-        ->allowedSorts(\Spatie\QueryBuilder\AllowedSort::custom('name', $customSort))
+        ->allowedSorts(\NadLambino\QueryBuilder\AllowedSort::custom('name', $customSort))
         ->toSql();
 
     expect($usingFilterFirst)->toEqual($usingSortFirst);
@@ -212,7 +212,7 @@ it('can filter when sorting by joining a related model which contains the same f
     ]);
 
     QueryBuilder::for(NestedRelatedModel::class, $req)
-        ->allowedSorts(\Spatie\QueryBuilder\AllowedSort::custom('name', $customSort))
+        ->allowedSorts(\NadLambino\QueryBuilder\AllowedSort::custom('name', $customSort))
         ->allowedFilters('name')
         ->get();
 

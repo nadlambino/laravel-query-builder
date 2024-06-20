@@ -1,9 +1,9 @@
 <?php
 
-namespace Spatie\QueryBuilder\Database\Factories;
+namespace NadLambino\QueryBuilder\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\SoftDeleteModel;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\SoftDeleteModel;
 
 class SoftDeleteModelFactory extends Factory
 {

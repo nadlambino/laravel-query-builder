@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\QueryBuilder\Tests\Concerns;
+namespace NadLambino\QueryBuilder\Tests\Concerns;
 
 use Illuminate\Support\Collection;
 

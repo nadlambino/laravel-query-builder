@@ -1,15 +1,15 @@
 <?php
 
-namespace Spatie\QueryBuilder;
+namespace NadLambino\QueryBuilder;
 
 use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Spatie\QueryBuilder\Includes\IncludedCallback;
-use Spatie\QueryBuilder\Includes\IncludedCount;
-use Spatie\QueryBuilder\Includes\IncludedExists;
-use Spatie\QueryBuilder\Includes\IncludedRelationship;
-use Spatie\QueryBuilder\Includes\IncludeInterface;
+use NadLambino\QueryBuilder\Includes\IncludedCallback;
+use NadLambino\QueryBuilder\Includes\IncludedCount;
+use NadLambino\QueryBuilder\Includes\IncludedExists;
+use NadLambino\QueryBuilder\Includes\IncludedRelationship;
+use NadLambino\QueryBuilder\Includes\IncludeInterface;
 
 class AllowedInclude
 {

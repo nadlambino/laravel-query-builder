@@ -1,7 +1,8 @@
 <?php
 
-namespace Spatie\QueryBuilder;
+namespace NadLambino\QueryBuilder;
 
+use NadLambino\QueryBuilder\Sources\RequestSource;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -16,15 +17,15 @@ class QueryBuilderServiceProvider extends PackageServiceProvider
 
     public function registeringPackage(): void
     {
-        $this->app->bind(QueryBuilderRequest::class, function ($app) {
-            return QueryBuilderRequest::fromRequest($app['request']);
+        $this->app->bind(RequestSource::class, function ($app) {
+            return RequestSource::make($app['request']);
         });
     }
 
     public function provides(): array
     {
         return [
-            QueryBuilderRequest::class,
+            RequestSource::class,
         ];
     }
 }

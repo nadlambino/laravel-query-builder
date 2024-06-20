@@ -1,17 +1,21 @@
 <?php
 
-namespace Spatie\QueryBuilder;
+namespace NadLambino\QueryBuilder;
 
 use ArrayAccess;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ForwardsCalls;
-use Spatie\QueryBuilder\Concerns\AddsFieldsToQuery;
-use Spatie\QueryBuilder\Concerns\AddsIncludesToQuery;
-use Spatie\QueryBuilder\Concerns\FiltersQuery;
-use Spatie\QueryBuilder\Concerns\SortsQuery;
+use NadLambino\QueryBuilder\Sources\CollectionSource;
+use NadLambino\QueryBuilder\Sources\RequestSource;
+use NadLambino\QueryBuilder\Sources\SourceInterface;
+use NadLambino\QueryBuilder\Concerns\AddsFieldsToQuery;
+use NadLambino\QueryBuilder\Concerns\AddsIncludesToQuery;
+use NadLambino\QueryBuilder\Concerns\FiltersQuery;
+use NadLambino\QueryBuilder\Concerns\SortsQuery;
 
 /**
  * @mixin EloquentBuilder
@@ -24,15 +28,21 @@ class QueryBuilder implements ArrayAccess
     use AddsFieldsToQuery;
     use ForwardsCalls;
 
-    protected QueryBuilderRequest $request;
+    protected SourceInterface $source;
 
     public function __construct(
         protected EloquentBuilder|Relation $subject,
-        ?Request $request = null
+        Request|Collection|array $source = null
     ) {
-        $this->request = $request
-            ? QueryBuilderRequest::fromRequest($request)
-            : app(QueryBuilderRequest::class);
+        $this->source = match (true) {
+            empty($source)                  => app(RequestSource::class),
+            $source instanceof Collection,
+            is_array($source)               => CollectionSource::make($source),
+            $source instanceof Request      => RequestSource::make($source),
+            default                         => RequestSource::make($source),
+        };
+
+        AllowedFilter::setSource($this->source);
     }
 
     public function getEloquentBuilder(): EloquentBuilder
@@ -51,13 +61,13 @@ class QueryBuilder implements ArrayAccess
 
     public static function for(
         EloquentBuilder|Relation|string $subject,
-        ?Request $request = null
+        Request|Collection $source = null
     ): static {
         if (is_subclass_of($subject, Model::class)) {
             $subject = $subject::query();
         }
 
-        return new static($subject, $request);
+        return new static($subject, $source);
     }
 
     public function __call($name, $arguments)

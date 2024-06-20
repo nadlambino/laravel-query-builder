@@ -1,12 +1,11 @@
 <?php
 
-namespace Spatie\QueryBuilder;
+namespace NadLambino\QueryBuilder\Concerns;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-class QueryBuilderRequest extends Request
+trait Source
 {
     protected static string $includesArrayValueDelimiter = ',';
 
@@ -27,16 +26,11 @@ class QueryBuilderRequest extends Request
         static::$sortsArrayValueDelimiter = $delimiter;
     }
 
-    public static function fromRequest(Request $request): self
-    {
-        return static::createFrom($request, new static());
-    }
-
     public function includes(): Collection
     {
         $includeParameterName = config('query-builder.parameters.include', 'include');
 
-        $includeParts = $this->getRequestData($includeParameterName);
+        $includeParts = $this->getData($includeParameterName);
 
         if (is_string($includeParts)) {
             $includeParts = explode(static::getIncludesArrayValueDelimiter(), $includeParts);
@@ -49,7 +43,7 @@ class QueryBuilderRequest extends Request
     {
         $appendParameterName = config('query-builder.parameters.append', 'append');
 
-        $appendParts = $this->getRequestData($appendParameterName);
+        $appendParts = $this->getData($appendParameterName);
 
         if (! is_array($appendParts) && ! is_null($appendParts)) {
             $appendParts = explode(static::getAppendsArrayValueDelimiter(), $appendParts);
@@ -61,7 +55,7 @@ class QueryBuilderRequest extends Request
     public function fields(): Collection
     {
         $fieldsParameterName = config('query-builder.parameters.fields', 'fields');
-        $fieldsData = $this->getRequestData($fieldsParameterName);
+        $fieldsData = $this->getData($fieldsParameterName);
 
         $fieldsPerTable = collect(is_string($fieldsData) ? explode(static::getFieldsArrayValueDelimiter(), $fieldsData) : $fieldsData);
 
@@ -97,7 +91,7 @@ class QueryBuilderRequest extends Request
     {
         $sortParameterName = config('query-builder.parameters.sort', 'sort');
 
-        $sortParts = $this->getRequestData($sortParameterName);
+        $sortParts = $this->getData($sortParameterName);
 
         if (is_string($sortParts)) {
             $sortParts = explode(static::getSortsArrayValueDelimiter(), $sortParts);
@@ -110,7 +104,7 @@ class QueryBuilderRequest extends Request
     {
         $filterParameterName = config('query-builder.parameters.filter', 'filter');
 
-        $filterParts = $this->getRequestData($filterParameterName, []);
+        $filterParts = $this->getData($filterParameterName, []);
 
         if (is_string($filterParts)) {
             return collect();
@@ -149,11 +143,6 @@ class QueryBuilderRequest extends Request
         }
 
         return $value;
-    }
-
-    protected function getRequestData(?string $key = null, $default = null)
-    {
-        return $this->input($key, $default);
     }
 
     public static function setIncludesArrayValueDelimiter(string $includesArrayValueDelimiter): void

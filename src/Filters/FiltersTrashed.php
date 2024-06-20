@@ -1,12 +1,12 @@
 <?php
 
-namespace Spatie\QueryBuilder\Filters;
+namespace NadLambino\QueryBuilder\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @template TModelClass of \Illuminate\Database\Eloquent\Model
- * @template-implements \Spatie\QueryBuilder\Filters\Filter<TModelClass>
+ * @template-implements \NadLambino\QueryBuilder\Filters\Filter<TModelClass>
  */
 class FiltersTrashed implements Filter
 {

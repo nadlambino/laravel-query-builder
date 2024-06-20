@@ -2,9 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\Tests\TestCase;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\TestModel;
+use NadLambino\QueryBuilder\QueryBuilder;
+use NadLambino\QueryBuilder\Tests\TestCase;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\TestModel;
 
 uses(TestCase::class)->in(__DIR__);
 
@@ -17,6 +17,17 @@ function createQueryFromFilterRequest(array $filters, string $model = null): Que
     ]);
 
     return QueryBuilder::for($model, $request);
+}
+
+function createQueryFromFilterCollection(array $filters, string $model = null): QueryBuilder
+{
+    $model ??= TestModel::class;
+
+    $collection = collect([
+        'filter' => $filters,
+    ]);
+
+    return QueryBuilder::for($model, $collection);
 }
 
 function assertQueryExecuted(string $query)

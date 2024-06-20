@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\QueryBuilder\Includes;
+namespace NadLambino\QueryBuilder\Includes;
 
 use Illuminate\Database\Eloquent\Builder;
 

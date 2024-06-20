@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\QueryBuilder\Filters;
+namespace NadLambino\QueryBuilder\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
 

@@ -1,12 +1,12 @@
 <?php
 
-namespace Spatie\QueryBuilder\Concerns;
+namespace NadLambino\QueryBuilder\Concerns;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Spatie\QueryBuilder\Exceptions\AllowedFieldsMustBeCalledBeforeAllowedIncludes;
-use Spatie\QueryBuilder\Exceptions\InvalidFieldQuery;
-use Spatie\QueryBuilder\Exceptions\UnknownIncludedFieldsQuery;
+use NadLambino\QueryBuilder\Exceptions\AllowedFieldsMustBeCalledBeforeAllowedIncludes;
+use NadLambino\QueryBuilder\Exceptions\InvalidFieldQuery;
+use NadLambino\QueryBuilder\Exceptions\UnknownIncludedFieldsQuery;
 
 trait AddsFieldsToQuery
 {
@@ -36,7 +36,7 @@ trait AddsFieldsToQuery
     {
         $modelTableName = $this->getModel()->getTable();
 
-        $fields = $this->request->fields();
+        $fields = $this->source->fields();
 
         $modelFields = $fields->has($modelTableName) ? $fields->get($modelTableName) : $fields->get('_');
 
@@ -55,7 +55,7 @@ trait AddsFieldsToQuery
             ? Str::plural(Str::snake($relation))
             : $relation;
 
-        $fields = $this->request->fields()
+        $fields = $this->source->fields()
             ->mapWithKeys(fn ($fields, $table) => [$table => $fields])
             ->get($tableOrRelation);
 
@@ -76,7 +76,7 @@ trait AddsFieldsToQuery
     {
         $modelTable = $this->getModel()->getTable();
 
-        $requestedFields = $this->request->fields()
+        $requestedFields = $this->source->fields()
             ->map(function ($fields, $model) use ($modelTable) {
                 $tableName = $model;
 

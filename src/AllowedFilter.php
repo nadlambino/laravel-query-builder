@@ -1,19 +1,21 @@
 <?php
 
-namespace Spatie\QueryBuilder;
+namespace NadLambino\QueryBuilder;
 
 use Illuminate\Support\Collection;
-use Spatie\QueryBuilder\Filters\Filter;
-use Spatie\QueryBuilder\Filters\FiltersBeginsWithStrict;
-use Spatie\QueryBuilder\Filters\FiltersCallback;
-use Spatie\QueryBuilder\Filters\FiltersEndsWithStrict;
-use Spatie\QueryBuilder\Filters\FiltersExact;
-use Spatie\QueryBuilder\Filters\FiltersPartial;
-use Spatie\QueryBuilder\Filters\FiltersScope;
-use Spatie\QueryBuilder\Filters\FiltersTrashed;
+use NadLambino\QueryBuilder\Filters\Filter;
+use NadLambino\QueryBuilder\Filters\FiltersBeginsWithStrict;
+use NadLambino\QueryBuilder\Filters\FiltersCallback;
+use NadLambino\QueryBuilder\Filters\FiltersEndsWithStrict;
+use NadLambino\QueryBuilder\Filters\FiltersExact;
+use NadLambino\QueryBuilder\Filters\FiltersPartial;
+use NadLambino\QueryBuilder\Filters\FiltersScope;
+use NadLambino\QueryBuilder\Filters\FiltersTrashed;
 
 class AllowedFilter
 {
+    use Allowable;
+
     protected string $internalName;
 
     protected Collection $ignored;
@@ -48,7 +50,7 @@ class AllowedFilter
     public static function setFilterArrayValueDelimiter(string $delimiter = null): void
     {
         if (isset($delimiter)) {
-            QueryBuilderRequest::setFilterArrayValueDelimiter($delimiter);
+            (static::getSourceClass())::setFilterArrayValueDelimiter($delimiter);
         }
     }
 

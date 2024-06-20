@@ -1,12 +1,12 @@
 <?php
 
-namespace Spatie\QueryBuilder\Concerns;
+namespace NadLambino\QueryBuilder\Concerns;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Spatie\QueryBuilder\AllowedInclude;
-use Spatie\QueryBuilder\Exceptions\InvalidIncludeQuery;
-use Spatie\QueryBuilder\Includes\IncludeInterface;
+use NadLambino\QueryBuilder\AllowedInclude;
+use NadLambino\QueryBuilder\Exceptions\InvalidIncludeQuery;
+use NadLambino\QueryBuilder\Includes\IncludeInterface;
 
 trait AddsIncludesToQuery
 {
@@ -45,7 +45,7 @@ trait AddsIncludesToQuery
 
         $this->ensureAllIncludesExist();
 
-        $includes = $this->filterNonExistingIncludes($this->request->includes());
+        $includes = $this->filterNonExistingIncludes($this->source->includes());
 
         $this->addIncludesToQuery($includes);
 
@@ -73,7 +73,7 @@ trait AddsIncludesToQuery
             return;
         }
 
-        $includes = $this->request->includes();
+        $includes = $this->source->includes();
 
         $allowedIncludeNames = $this->allowedIncludes?->map(fn (AllowedInclude $allowedInclude) => $allowedInclude->getName());
 

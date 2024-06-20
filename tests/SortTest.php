@@ -6,16 +6,16 @@ use Illuminate\Support\Facades\DB;
 
 use function PHPUnit\Framework\assertObjectHasProperty;
 
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\AllowedSort;
-use Spatie\QueryBuilder\Enums\SortDirection;
-use Spatie\QueryBuilder\Exceptions\InvalidSortQuery;
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\Sorts\Sort as SortInterface;
-use Spatie\QueryBuilder\Sorts\SortsField;
-use Spatie\QueryBuilder\Tests\Concerns\AssertsCollectionSorting;
+use NadLambino\QueryBuilder\AllowedFilter;
+use NadLambino\QueryBuilder\AllowedSort;
+use NadLambino\QueryBuilder\Enums\SortDirection;
+use NadLambino\QueryBuilder\Exceptions\InvalidSortQuery;
+use NadLambino\QueryBuilder\QueryBuilder;
+use NadLambino\QueryBuilder\Sorts\Sort as SortInterface;
+use NadLambino\QueryBuilder\Sorts\SortsField;
+use NadLambino\QueryBuilder\Tests\Concerns\AssertsCollectionSorting;
 
-use Spatie\QueryBuilder\Tests\TestClasses\Models\TestModel;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\TestModel;
 
 uses(AssertsCollectionSorting::class);
 

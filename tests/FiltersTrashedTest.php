@@ -1,7 +1,7 @@
 <?php
 
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\SoftDeleteModel;
+use NadLambino\QueryBuilder\AllowedFilter;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\SoftDeleteModel;
 
 beforeEach(function () {
     $this->models = collect([

@@ -1,10 +1,10 @@
 <?php
 
-namespace Spatie\QueryBuilder\Concerns;
+namespace NadLambino\QueryBuilder\Concerns;
 
 use Illuminate\Support\Collection;
-use Spatie\QueryBuilder\AllowedSort;
-use Spatie\QueryBuilder\Exceptions\InvalidSortQuery;
+use NadLambino\QueryBuilder\AllowedSort;
+use NadLambino\QueryBuilder\Exceptions\InvalidSortQuery;
 
 trait SortsQuery
 {
@@ -24,7 +24,7 @@ trait SortsQuery
 
         $this->ensureAllSortsExist();
 
-        $this->addRequestedSortsToQuery(); // allowed is known & request is known, add what we can, if there is no request, -wait
+        $this->addRequestedSortsToQuery(); // allowed is known & source is known, add what we can, if there is no source, -wait
 
         return $this;
     }
@@ -38,7 +38,7 @@ trait SortsQuery
 
     public function defaultSorts(AllowedSort|array|string $sorts): static
     {
-        if ($this->request->sorts()->isNotEmpty()) {
+        if ($this->source->sorts()->isNotEmpty()) {
             // We've got requested sorts. No need to parse defaults.
 
             return $this;
@@ -61,7 +61,7 @@ trait SortsQuery
 
     protected function addRequestedSortsToQuery(): void
     {
-        $this->request->sorts()
+        $this->source->sorts()
             ->each(function (string $property) {
                 $descending = $property[0] === '-';
 
@@ -85,7 +85,7 @@ trait SortsQuery
             return;
         }
 
-        $requestedSortNames = $this->request->sorts()->map(fn (string $sort) => ltrim($sort, '-'));
+        $requestedSortNames = $this->source->sorts()->map(fn (string $sort) => ltrim($sort, '-'));
 
         $allowedSortNames = $this->allowedSorts->map(fn (AllowedSort $sort) => $sort->getName());
 

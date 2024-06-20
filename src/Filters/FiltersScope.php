@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\QueryBuilder\Filters;
+namespace NadLambino\QueryBuilder\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -11,11 +11,11 @@ use ReflectionException;
 use ReflectionObject;
 use ReflectionParameter;
 use ReflectionUnionType;
-use Spatie\QueryBuilder\Exceptions\InvalidFilterValue;
+use NadLambino\QueryBuilder\Exceptions\InvalidFilterValue;
 
 /**
  * @template TModelClass of \Illuminate\Database\Eloquent\Model
- * @template-implements \Spatie\QueryBuilder\Filters\Filter<TModelClass>
+ * @template-implements \NadLambino\QueryBuilder\Filters\Filter<TModelClass>
  */
 class FiltersScope implements Filter
 {

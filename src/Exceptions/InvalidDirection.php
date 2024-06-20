@@ -1,9 +1,9 @@
 <?php
 
-namespace Spatie\QueryBuilder\Exceptions;
+namespace NadLambino\QueryBuilder\Exceptions;
 
 use Exception;
-use Spatie\QueryBuilder\Enums\SortDirection;
+use NadLambino\QueryBuilder\Enums\SortDirection;
 
 class InvalidDirection extends Exception
 {

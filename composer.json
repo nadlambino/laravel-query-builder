@@ -1,21 +1,20 @@
 {
-    "name": "spatie/laravel-query-builder",
-    "description": "Easily build Eloquent queries from API requests",
+    "name": "nadlambino/laravel-query-builder",
+    "description": "This is a forked of spatie/laravel-query-builder but decoupled the builder from request.",
     "keywords": [
-        "spatie",
+        "nadlambino",
         "laravel-query-builder"
     ],
-    "homepage": "https://github.com/spatie/laravel-query-builder",
+    "homepage": "https://github.com/nadlambino/laravel-query-builder",
     "license": "MIT",
     "support": {
-        "issues": "https://github.com/spatie/laravel-query-builder/issues",
-        "source": "https://github.com/spatie/laravel-query-builder"
+        "issues": "https://github.com/nadlambino/laravel-query-builder/issues",
+        "source": "https://github.com/nadlambino/laravel-query-builder"
     },
     "authors": [
         {
-            "name": "Alex Vanderbist",
-            "email": "alex@spatie.be",
-            "homepage": "https://spatie.be",
+            "name": "Ronald Lambino",
+            "email": "ronaldlambino0000@gmail.com",
             "role": "Developer"
         }
     ],
@@ -37,13 +36,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Spatie\\QueryBuilder\\": "src",
-            "Spatie\\QueryBuilder\\Database\\Factories\\": "database/factories"
+            "NadLambino\\QueryBuilder\\": "src",
+            "NadLambino\\QueryBuilder\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Spatie\\QueryBuilder\\Tests\\": "tests"
+            "NadLambino\\QueryBuilder\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -61,7 +60,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Spatie\\QueryBuilder\\QueryBuilderServiceProvider"
+                "NadLambino\\QueryBuilder\\QueryBuilderServiceProvider"
             ]
         }
     },

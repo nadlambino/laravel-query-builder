@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\QueryBuilder\Exceptions;
+namespace NadLambino\QueryBuilder\Exceptions;
 
 use BadMethodCallException;
 

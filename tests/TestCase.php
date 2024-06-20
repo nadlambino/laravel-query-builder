@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\QueryBuilder\Tests;
+namespace NadLambino\QueryBuilder\Tests;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -10,9 +10,9 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase as Orchestra;
+use NadLambino\QueryBuilder\QueryBuilderServiceProvider;
+use NadLambino\QueryBuilder\Sources\RequestSource;
 use Spatie\LaravelRay\RayServiceProvider;
-use Spatie\QueryBuilder\QueryBuilderRequest;
-use Spatie\QueryBuilder\QueryBuilderServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -24,10 +24,10 @@ class TestCase extends Orchestra
 
         $this->setUpDatabase($this->app);
 
-        QueryBuilderRequest::resetDelimiters();
+        RequestSource::resetDelimiters();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Spatie\\QueryBuilder\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'NadLambino\\QueryBuilder\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 

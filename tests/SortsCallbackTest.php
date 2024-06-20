@@ -2,9 +2,9 @@
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use Spatie\QueryBuilder\AllowedSort;
-use Spatie\QueryBuilder\Tests\Concerns\AssertsCollectionSorting;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\TestModel;
+use NadLambino\QueryBuilder\AllowedSort;
+use NadLambino\QueryBuilder\Tests\Concerns\AssertsCollectionSorting;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\TestModel;
 
 uses(AssertsCollectionSorting::class);
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace Spatie\QueryBuilder\Concerns;
+namespace NadLambino\QueryBuilder\Concerns;
 
 use Illuminate\Support\Collection;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\Exceptions\InvalidFilterQuery;
+use NadLambino\QueryBuilder\AllowedFilter;
+use NadLambino\QueryBuilder\Exceptions\InvalidFilterQuery;
 
 trait FiltersQuery
 {
@@ -33,7 +33,7 @@ trait FiltersQuery
     {
         $this->allowedFilters->each(function (AllowedFilter $filter) {
             if ($this->isFilterRequested($filter)) {
-                $value = $this->request->filters()->get($filter->getName());
+                $value = $this->source->filters()->get($filter->getName());
                 $filter->filter($this, $value);
 
                 return;
@@ -55,7 +55,7 @@ trait FiltersQuery
 
     protected function isFilterRequested(AllowedFilter $allowedFilter): bool
     {
-        return $this->request->filters()->has($allowedFilter->getName());
+        return $this->source->filters()->has($allowedFilter->getName());
     }
 
     protected function ensureAllFiltersExist(): void
@@ -64,7 +64,7 @@ trait FiltersQuery
             return;
         }
 
-        $filterNames = $this->request->filters()->keys();
+        $filterNames = $this->source->filters()->keys();
 
         $allowedFilterNames = $this->allowedFilters->map(function (AllowedFilter $allowedFilter) {
             return $allowedFilter->getName();

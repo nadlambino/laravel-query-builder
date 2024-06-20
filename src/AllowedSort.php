@@ -1,12 +1,12 @@
 <?php
 
-namespace Spatie\QueryBuilder;
+namespace NadLambino\QueryBuilder;
 
-use Spatie\QueryBuilder\Enums\SortDirection;
-use Spatie\QueryBuilder\Exceptions\InvalidDirection;
-use Spatie\QueryBuilder\Sorts\Sort;
-use Spatie\QueryBuilder\Sorts\SortsCallback;
-use Spatie\QueryBuilder\Sorts\SortsField;
+use NadLambino\QueryBuilder\Enums\SortDirection;
+use NadLambino\QueryBuilder\Exceptions\InvalidDirection;
+use NadLambino\QueryBuilder\Sorts\Sort;
+use NadLambino\QueryBuilder\Sorts\SortsCallback;
+use NadLambino\QueryBuilder\Sorts\SortsField;
 
 class AllowedSort
 {

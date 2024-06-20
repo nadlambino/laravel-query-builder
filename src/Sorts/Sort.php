@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\QueryBuilder\Sorts;
+namespace NadLambino\QueryBuilder\Sorts;
 
 use Illuminate\Database\Eloquent\Builder;
 

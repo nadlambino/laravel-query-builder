@@ -1,13 +1,13 @@
 <?php
 
-namespace Spatie\QueryBuilder\Tests\TestClasses\Filters;
+namespace NadLambino\QueryBuilder\Tests\TestClasses\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
-use Spatie\QueryBuilder\Filters\Filter;
+use NadLambino\QueryBuilder\Filters\Filter;
 
 /**
  * @template TModelClass of \Illuminate\Database\Eloquent\Model
- * @template-implements \Spatie\QueryBuilder\Filters\Filter<TModelClass>
+ * @template-implements \NadLambino\QueryBuilder\Filters\Filter<TModelClass>
  */
 class FiltersTestModels implements Filter
 {

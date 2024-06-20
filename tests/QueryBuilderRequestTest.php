@@ -1,6 +1,6 @@
 <?php
 
-use Spatie\QueryBuilder\QueryBuilderRequest;
+use NadLambino\QueryBuilder\Sources\RequestSource;
 
 it('can filter nested arrays', function () {
     $expected = [
@@ -11,7 +11,7 @@ it('can filter nested arrays', function () {
         ],
     ];
 
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'filter' => $expected,
     ]);
 
@@ -19,7 +19,7 @@ it('can filter nested arrays', function () {
 });
 
 it('can get empty filters recursively', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'filter' => [
             'info' => [
                 'foo' => [
@@ -41,7 +41,7 @@ it('can get empty filters recursively', function () {
 });
 
 it('will map true and false as booleans recursively', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'filter' => [
             'info' => [
                 'foo' => [
@@ -67,7 +67,7 @@ it('will map true and false as booleans recursively', function () {
 });
 
 it('can get the sort query param from the request', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'sort' => 'foobar',
     ]);
 
@@ -75,7 +75,7 @@ it('can get the sort query param from the request', function () {
 });
 
 it('can get the sort query param from the request body', function () {
-    $request = new QueryBuilderRequest([], [
+    $request = new RequestSource([], [
         'sort' => 'foobar',
     ], [], [], [], ['REQUEST_METHOD' => 'POST']);
 
@@ -85,7 +85,7 @@ it('can get the sort query param from the request body', function () {
 it('can get different sort query parameter name', function () {
     config(['query-builder.parameters.sort' => 'sorts']);
 
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'sorts' => 'foobar',
     ]);
 
@@ -93,13 +93,13 @@ it('can get different sort query parameter name', function () {
 });
 
 it('will return an empty collection when no sort query param is specified', function () {
-    $request = new QueryBuilderRequest();
+    $request = new RequestSource();
 
     expect($request->sorts())->toBeEmpty();
 });
 
 it('can get multiple sort parameters from the request', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'sort' => 'foo,bar',
     ]);
 
@@ -109,7 +109,7 @@ it('can get multiple sort parameters from the request', function () {
 });
 
 it('will return an empty collection when no sort query params are specified', function () {
-    $request = new QueryBuilderRequest();
+    $request = new RequestSource();
 
     $expected = collect();
 
@@ -117,7 +117,7 @@ it('will return an empty collection when no sort query params are specified', fu
 });
 
 it('can get the filter query params from the request', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'filter' => [
             'foo' => 'bar',
             'baz' => 'qux',
@@ -133,7 +133,7 @@ it('can get the filter query params from the request', function () {
 });
 
 it('can get the filter query params from the request body', function () {
-    $request = new QueryBuilderRequest([], [
+    $request = new RequestSource([], [
             'filter' => [
                 'foo' => 'bar',
                 'baz' => 'qux',
@@ -151,7 +151,7 @@ it('can get the filter query params from the request body', function () {
 it('can use different filter query parameter name', function () {
     config(['query-builder.parameters.filter' => 'filters']);
 
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'filters' => [
             'foo' => 'bar',
             'baz' => 'qux,lex',
@@ -169,7 +169,7 @@ it('can use different filter query parameter name', function () {
 it('can use null as the filter query parameter name', function () {
     config(['query-builder.parameters.filter' => null]);
 
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'foo' => 'bar',
         'baz' => 'qux,lex',
     ]);
@@ -185,7 +185,7 @@ it('can use null as the filter query parameter name', function () {
 it('can get empty filters', function () {
     config(['query-builder.parameters.filter' => 'filters']);
 
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'filters' => [
             'foo' => 'bar',
             'baz' => null,
@@ -201,7 +201,7 @@ it('can get empty filters', function () {
 });
 
 it('will return an empty collection when no filter query params are specified', function () {
-    $request = new QueryBuilderRequest();
+    $request = new RequestSource();
 
     $expected = collect();
 
@@ -209,7 +209,7 @@ it('will return an empty collection when no filter query params are specified', 
 });
 
 it('will map true and false as booleans when given in a filter query string', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'filter' => [
             'foo' => 'true',
             'bar' => 'false',
@@ -227,7 +227,7 @@ it('will map true and false as booleans when given in a filter query string', fu
 });
 
 it('will map comma separated values as arrays when given in a filter query string', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'filter' => [
             'foo' => 'bar,baz',
         ],
@@ -239,7 +239,7 @@ it('will map comma separated values as arrays when given in a filter query strin
 });
 
 it('will map array in filter recursively when given in a filter query string', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'filter' => [
             'foo' => 'bar,baz',
             'bar' => [
@@ -254,7 +254,7 @@ it('will map array in filter recursively when given in a filter query string', f
 });
 
 it('will map comma separated values as arrays when given in a filter query string and get those by key', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'filter' => [
             'foo' => 'bar,baz',
         ],
@@ -266,7 +266,7 @@ it('will map comma separated values as arrays when given in a filter query strin
 });
 
 it('can get the include query params from the request', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'include' => 'foo,bar',
     ]);
 
@@ -276,7 +276,7 @@ it('can get the include query params from the request', function () {
 });
 
 it('can get the include from the request body', function () {
-    $request = new QueryBuilderRequest([], [
+    $request = new RequestSource([], [
         'include' => 'foo,bar',
     ], [], [], [], ['REQUEST_METHOD' => 'POST']);
 
@@ -288,7 +288,7 @@ it('can get the include from the request body', function () {
 it('can get different include query parameter name', function () {
     config(['query-builder.parameters.include' => 'includes']);
 
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'includes' => 'foo,bar',
     ]);
 
@@ -298,7 +298,7 @@ it('can get different include query parameter name', function () {
 });
 
 it('will return an empty collection when no include query params are specified', function () {
-    $request = new QueryBuilderRequest();
+    $request = new RequestSource();
 
     $expected = collect();
 
@@ -306,7 +306,7 @@ it('will return an empty collection when no include query params are specified',
 });
 
 it('can get requested fields', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'fields' => [
             'table' => 'name,email',
         ],
@@ -318,7 +318,7 @@ it('can get requested fields', function () {
 });
 
 it('can get requested fields without a table name', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'fields' => 'name,email,related.id,related.type',
     ]);
 
@@ -328,7 +328,7 @@ it('can get requested fields without a table name', function () {
 });
 
 it('can get nested fields', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'fields' => [
             'table' => 'name,email',
             'pivots' => 'id,type',
@@ -346,7 +346,7 @@ it('can get nested fields', function () {
 });
 
 it('can get nested fields from a string fields request', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'fields' => 'id,name,email,pivots.id,pivots.type,pivots.posts.content',
     ]);
 
@@ -360,7 +360,7 @@ it('can get nested fields from a string fields request', function () {
 });
 
 it('can get requested fields from the request body', function () {
-    $request = new QueryBuilderRequest([], [
+    $request = new RequestSource([], [
         'fields' => [
             'table' => 'name,email',
         ],
@@ -374,7 +374,7 @@ it('can get requested fields from the request body', function () {
 it('can get different fields parameter name', function () {
     config(['query-builder.parameters.fields' => 'field']);
 
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'field' => [
             'column' => 'name,email',
         ],
@@ -386,7 +386,7 @@ it('can get different fields parameter name', function () {
 });
 
 it('can get the append query params from the request', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'append' => 'foo,bar',
     ]);
 
@@ -398,7 +398,7 @@ it('can get the append query params from the request', function () {
 it('can get different append query parameter name', function () {
     config(['query-builder.parameters.append' => 'appendit']);
 
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'appendit' => 'foo,bar',
     ]);
 
@@ -408,7 +408,7 @@ it('can get different append query parameter name', function () {
 });
 
 it('will return an empty collection when no append query params are specified', function () {
-    $request = new QueryBuilderRequest();
+    $request = new RequestSource();
 
     $expected = collect();
 
@@ -416,7 +416,7 @@ it('will return an empty collection when no append query params are specified', 
 });
 
 it('can get the append query params from the request body', function () {
-    $request = new QueryBuilderRequest([], [
+    $request = new RequestSource([], [
         'append' => 'foo,bar',
     ], [], [], [], ['REQUEST_METHOD' => 'POST']);
 
@@ -426,13 +426,13 @@ it('can get the append query params from the request body', function () {
 });
 
 it('takes custom delimiters for splitting request parameters', function () {
-    $request = new QueryBuilderRequest([
+    $request = new RequestSource([
         'filter' => [
             'foo' => 'values, contain, commas|and are split on vertical| lines',
         ],
     ]);
 
-    QueryBuilderRequest::setArrayValueDelimiter('|');
+    RequestSource::setArrayValueDelimiter('|');
 
     $expected = ['foo' => ['values, contain, commas', 'and are split on vertical', ' lines']];
 

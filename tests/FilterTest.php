@@ -9,13 +9,13 @@ use Pest\Expectation;
 
 use function PHPUnit\Framework\assertObjectHasProperty;
 
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\Exceptions\InvalidFilterQuery;
-use Spatie\QueryBuilder\Filters\Filter as CustomFilter;
-use Spatie\QueryBuilder\Filters\Filter as FilterInterface;
-use Spatie\QueryBuilder\Filters\FiltersExact;
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\TestModel;
+use NadLambino\QueryBuilder\AllowedFilter;
+use NadLambino\QueryBuilder\Exceptions\InvalidFilterQuery;
+use NadLambino\QueryBuilder\Filters\Filter as CustomFilter;
+use NadLambino\QueryBuilder\Filters\Filter as FilterInterface;
+use NadLambino\QueryBuilder\Filters\FiltersExact;
+use NadLambino\QueryBuilder\QueryBuilder;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\TestModel;
 
 beforeEach(function () {
     $this->models = TestModel::factory()->count(5)->create();
@@ -25,6 +25,14 @@ it('can filter models by partial property by default', function () {
     $models = createQueryFromFilterRequest([
         'name' => $this->models->first()->name,
     ])
+        ->allowedFilters('name')
+        ->get();
+
+    expect($models)->toHaveCount(1);
+
+    $models = createQueryFromFilterCollection([
+            'name' => $this->models->first()->name,
+        ])
         ->allowedFilters('name')
         ->get();
 
@@ -39,10 +47,26 @@ it('can filter models by an array as filter value', function () {
         ->get();
 
     expect($models)->toHaveCount(1);
+
+    $models = createQueryFromFilterCollection([
+            'name' => ['first' => $this->models->first()->name],
+        ])
+        ->allowedFilters('name')
+        ->get();
+
+    expect($models)->toHaveCount(1);
 });
 
 it('can filter partially and case insensitive', function () {
     $models = createQueryFromFilterRequest([
+            'name' => strtoupper($this->models->first()->name),
+        ])
+        ->allowedFilters('name')
+        ->get();
+
+    expect($models)->toHaveCount(1);
+
+    $models = createQueryFromFilterCollection([
             'name' => strtoupper($this->models->first()->name),
         ])
         ->allowedFilters('name')

@@ -1,7 +1,7 @@
 <?php
 
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\Tests\TestClasses\Models\TestModel;
+use NadLambino\QueryBuilder\AllowedFilter;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\TestModel;
 
 beforeEach(function () {
     $this->models = TestModel::factory()->count(5)->create();

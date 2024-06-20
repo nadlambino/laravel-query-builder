@@ -1,8 +1,8 @@
 <?php
 
-namespace Spatie\QueryBuilder\Database\Factories;
+namespace NadLambino\QueryBuilder\Database\Factories;
 
-use Spatie\QueryBuilder\Tests\TestClasses\Models\AppendModel;
+use NadLambino\QueryBuilder\Tests\TestClasses\Models\AppendModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AppendModelFactory extends Factory

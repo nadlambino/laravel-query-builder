@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\QueryBuilder\Tests\TestClasses\Models;
+namespace NadLambino\QueryBuilder\Tests\TestClasses\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

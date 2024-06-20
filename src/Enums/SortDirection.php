@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\QueryBuilder\Enums;
+namespace NadLambino\QueryBuilder\Enums;
 
 class SortDirection
 {
