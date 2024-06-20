@@ -32,10 +32,10 @@ class QueryBuilder implements ArrayAccess
 
     public function __construct(
         protected EloquentBuilder|Relation $subject,
-        Request|Collection|array $source = null
+        Request|Collection|array|null $source = null
     ) {
         $this->source = match (true) {
-            empty($source)                  => app(RequestSource::class),
+            is_null($source)                => app(RequestSource::class),
             $source instanceof Collection,
             is_array($source)               => CollectionSource::make($source),
             $source instanceof Request      => RequestSource::make($source),
@@ -61,7 +61,7 @@ class QueryBuilder implements ArrayAccess
 
     public static function for(
         EloquentBuilder|Relation|string $subject,
-        Request|Collection $source = null
+        Request|Collection|array|null $source = null
     ): static {
         if (is_subclass_of($subject, Model::class)) {
             $subject = $subject::query();
