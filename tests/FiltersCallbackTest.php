@@ -18,10 +18,28 @@ it('should filter by closure', function () {
         ->get();
 
     expect($models)->toHaveCount(1);
+
+    $models = createQueryFromFilterCollection([
+            'callback' => $this->models->first()->name,
+        ])
+        ->allowedFilters(AllowedFilter::callback('callback', function (Builder $query, $value) {
+            $query->where('name', $value);
+        }))
+        ->get();
+
+    expect($models)->toHaveCount(1);
 });
 
 it('should filter by array callback', function () {
     $models = createQueryFromFilterRequest([
+            'callback' => $this->models->first()->name,
+        ])
+        ->allowedFilters(AllowedFilter::callback('callback', [$this, 'filterCallback']))
+        ->get();
+
+    expect($models)->toHaveCount(1);
+
+    $models = createQueryFromFilterCollection([
             'callback' => $this->models->first()->name,
         ])
         ->allowedFilters(AllowedFilter::callback('callback', [$this, 'filterCallback']))
