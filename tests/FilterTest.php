@@ -15,6 +15,8 @@ use NadLambino\QueryBuilder\Filters\Filter as CustomFilter;
 use NadLambino\QueryBuilder\Filters\Filter as FilterInterface;
 use NadLambino\QueryBuilder\Filters\FiltersExact;
 use NadLambino\QueryBuilder\QueryBuilder;
+use NadLambino\QueryBuilder\Sources\CollectionSource;
+use NadLambino\QueryBuilder\Sources\RequestSource;
 use NadLambino\QueryBuilder\Tests\TestClasses\Models\TestModel;
 
 beforeEach(function () {
@@ -87,10 +89,27 @@ it('can filter results based on the partial existence of a property in an array'
 
     expect($results)->toHaveCount(2);
     expect($results->pluck('id')->all())->toEqual([$model1->id, $model2->id]);
+
+    $results = createQueryFromFilterCollection([
+            'name' => 'abc,xyz',
+        ])
+        ->allowedFilters('name')
+        ->get();
+
+    expect($results)->toHaveCount(2);
+    expect($results->pluck('id')->all())->toEqual([$model1->id, $model2->id]);
 });
 
 it('can filter models and return an empty collection', function () {
     $models = createQueryFromFilterRequest([
+            'name' => 'None existing first name',
+        ])
+        ->allowedFilters('name')
+        ->get();
+
+    expect($models)->toHaveCount(0);
+
+    $models = createQueryFromFilterCollection([
             'name' => 'None existing first name',
         ])
         ->allowedFilters('name')
@@ -105,6 +124,20 @@ it('can filter a custom base query with select', function () {
     ]);
 
     $queryBuilderSql = QueryBuilder::for(TestModel::select('id', 'name'), $request)
+        ->allowedFilters('name', 'id')
+        ->toSql();
+
+    $expectedSql = TestModel::select('id', 'name')
+        ->where(DB::raw('LOWER(`test_models`.`name`)'), 'LIKE', 'john')
+        ->toSql();
+
+    expect($queryBuilderSql)->toContain($expectedSql);
+
+    $source = collect([
+        'filter' => ['name' => 'john'],
+    ]);
+
+    $queryBuilderSql = QueryBuilder::for(TestModel::select('id', 'name'), $source)
         ->allowedFilters('name', 'id')
         ->toSql();
 
@@ -146,6 +179,15 @@ it('can filter results based on the existence of a property in an array', functi
 
     expect($results)->toHaveCount(2);
     expect($results->pluck('id')->all())->toEqual([1, 2]);
+
+    $results = createQueryFromFilterCollection([
+            'id' => '1,2',
+        ])
+        ->allowedFilters(AllowedFilter::exact('id'))
+        ->get();
+
+    expect($results)->toHaveCount(2);
+    expect($results->pluck('id')->all())->toEqual([1, 2]);
 });
 
 it('ignores empty values in an array partial filter', function () {
@@ -157,10 +199,27 @@ it('ignores empty values in an array partial filter', function () {
 
     expect($results)->toHaveCount(1);
     expect($results->pluck('id')->all())->toEqual([2]);
+
+    $results = createQueryFromFilterCollection([
+            'id' => '2,',
+        ])
+        ->allowedFilters(AllowedFilter::partial('id'))
+        ->get();
+
+    expect($results)->toHaveCount(1);
+    expect($results->pluck('id')->all())->toEqual([2]);
 });
 
 it('ignores an empty array partial filter', function () {
     $results = createQueryFromFilterRequest([
+            'id' => ',,',
+        ])
+        ->allowedFilters(AllowedFilter::partial('id'))
+        ->get();
+
+    expect($results)->toHaveCount(5);
+
+    $results = createQueryFromFilterCollection([
             'id' => ',,',
         ])
         ->allowedFilters(AllowedFilter::partial('id'))
@@ -179,6 +238,14 @@ test('falsy values are not ignored when applying a partial filter', function () 
         ->get();
 
     $this->assertQueryLogContains("select * from `test_models` where (LOWER(`test_models`.`id`) LIKE ?)");
+
+    createQueryFromFilterCollection([
+            'id' => [0],
+        ])
+        ->allowedFilters(AllowedFilter::partial('id'))
+        ->get();
+
+    $this->assertQueryLogContains("select * from `test_models` where (LOWER(`test_models`.`id`) LIKE ?)");
 });
 
 test('falsy values are not ignored when applying a begins with strict filter', function () {
@@ -191,12 +258,28 @@ test('falsy values are not ignored when applying a begins with strict filter', f
         ->get();
 
     $this->assertQueryLogContains("select * from `test_models` where (`test_models`.`id` LIKE ?)");
+
+    createQueryFromFilterCollection([
+            'id' => [0],
+        ])
+        ->allowedFilters(AllowedFilter::beginsWithStrict('id'))
+        ->get();
+
+    $this->assertQueryLogContains("select * from `test_models` where (`test_models`.`id` LIKE ?)");
 });
 
 test('falsy values are not ignored when applying a ends with strict filter', function () {
     DB::enableQueryLog();
 
     createQueryFromFilterRequest([
+            'id' => [0],
+        ])
+        ->allowedFilters(AllowedFilter::endsWithStrict('id'))
+        ->get();
+
+    $this->assertQueryLogContains("select * from `test_models` where (`test_models`.`id` LIKE ?)");
+
+    createQueryFromFilterCollection([
             'id' => [0],
         ])
         ->allowedFilters(AllowedFilter::endsWithStrict('id'))
@@ -222,6 +305,20 @@ it('can filter partial using begins with strict', function () {
 
     expect($models->count())->toBe(1);
     expect($models2->count())->toBe(0);
+
+
+    $models = createQueryFromFilterCollection(['name' => 'john'])
+        ->allowedFilters([
+            AllowedFilter::beginsWithStrict('name'),
+        ]);
+
+    $models2 = createQueryFromFilterCollection(['name' => 'doe'])
+        ->allowedFilters([
+            AllowedFilter::beginsWithStrict('name'),
+        ]);
+
+    expect($models->count())->toBe(1);
+    expect($models2->count())->toBe(0);
 });
 
 it('can filter partial using ends with strict', function () {
@@ -235,6 +332,19 @@ it('can filter partial using ends with strict', function () {
         ]);
 
     $models2 = createQueryFromFilterRequest(['name' => 'john'])
+        ->allowedFilters([
+            AllowedFilter::endsWithStrict('name'),
+        ]);
+
+    expect($models->count())->toBe(1);
+    expect($models2->count())->toBe(0);
+
+    $models = createQueryFromFilterCollection(['name' => 'doe'])
+        ->allowedFilters([
+            AllowedFilter::endsWithStrict('name'),
+        ]);
+
+    $models2 = createQueryFromFilterCollection(['name' => 'john'])
         ->allowedFilters([
             AllowedFilter::endsWithStrict('name'),
         ]);
@@ -256,12 +366,28 @@ it('can filter and match results by exact property', function () {
         ->get();
 
     expect($models)->toEqual($modelsResult, $models);
+
+    $modelsResult = createQueryFromFilterCollection([
+            'id' => $testModel->id,
+        ])
+        ->allowedFilters(AllowedFilter::exact('id'))
+        ->get();
+
+    expect($models)->toEqual($modelsResult, $models);
 });
 
 it('can filter and reject results by exact property', function () {
     $testModel = TestModel::create(['name' => 'John Testing Doe']);
 
     $modelsResult = createQueryFromFilterRequest([
+            'name' => ' Testing ',
+        ])
+        ->allowedFilters(AllowedFilter::exact('name'))
+        ->get();
+
+    expect($modelsResult)->toHaveCount(0);
+
+    $modelsResult = createQueryFromFilterCollection([
             'name' => ' Testing ',
         ])
         ->allowedFilters(AllowedFilter::exact('name'))
@@ -278,6 +404,12 @@ it('can filter results by scope', function () {
         ->get();
 
     expect($modelsResult)->toHaveCount(1);
+
+    $modelsResult = createQueryFromFilterCollection(['named' => 'John Testing Doe'])
+        ->allowedFilters(AllowedFilter::scope('named'))
+        ->get();
+
+    expect($modelsResult)->toHaveCount(1);
 });
 
 it('can filter results by nested relation scope', function () {
@@ -286,6 +418,12 @@ it('can filter results by nested relation scope', function () {
     $testModel->relatedModels()->create(['name' => 'John\'s Post']);
 
     $modelsResult = createQueryFromFilterRequest(['relatedModels.named' => 'John\'s Post'])
+        ->allowedFilters(AllowedFilter::scope('relatedModels.named'))
+        ->get();
+
+    expect($modelsResult)->toHaveCount(1);
+
+    $modelsResult = createQueryFromFilterCollection(['relatedModels.named' => 'John\'s Post'])
         ->allowedFilters(AllowedFilter::scope('relatedModels.named'))
         ->get();
 
@@ -300,12 +438,24 @@ it('can filter results by type hinted scope', function () {
         ->get();
 
     expect($modelsResult)->toHaveCount(1);
+
+    $modelsResult = createQueryFromFilterCollection(['user' => 1])
+        ->allowedFilters(AllowedFilter::scope('user'))
+        ->get();
+
+    expect($modelsResult)->toHaveCount(1);
 });
 
 it('can filter results by regular and type hinted scope', function () {
     TestModel::create(['id' => 1000, 'name' => 'John Testing Doe']);
 
     $modelsResult = createQueryFromFilterRequest(['user_info' => ['id' => '1000', 'name' => 'John Testing Doe']])
+        ->allowedFilters(AllowedFilter::scope('user_info'))
+        ->get();
+
+    expect($modelsResult)->toHaveCount(1);
+
+    $modelsResult = createQueryFromFilterCollection(['user_info' => ['id' => '1000', 'name' => 'John Testing Doe']])
         ->allowedFilters(AllowedFilter::scope('user_info'))
         ->get();
 
@@ -322,6 +472,12 @@ it('can filter results by scope with multiple parameters', function () {
         ->get();
 
     expect($modelsResult)->toHaveCount(1);
+
+    $modelsResult = createQueryFromFilterCollection(['created_between' => '2016-01-01,2017-01-01'])
+        ->allowedFilters(AllowedFilter::scope('created_between'))
+        ->get();
+
+    expect($modelsResult)->toHaveCount(1);
 });
 
 it('can filter results by scope with multiple parameters in an associative array', function () {
@@ -330,6 +486,12 @@ it('can filter results by scope with multiple parameters in an associative array
     $testModel = TestModel::create(['name' => 'John Testing Doe']);
 
     $modelsResult = createQueryFromFilterRequest(['created_between' => ['start' => '2016-01-01', 'end' => '2017-01-01']])
+        ->allowedFilters(AllowedFilter::scope('created_between'))
+        ->get();
+
+    expect($modelsResult)->toHaveCount(1);
+
+    $modelsResult = createQueryFromFilterCollection(['created_between' => ['start' => '2016-01-01', 'end' => '2017-01-01']])
         ->allowedFilters(AllowedFilter::scope('created_between'))
         ->get();
 
@@ -353,6 +515,14 @@ it('can filter results by a custom filter class', function () {
         ->first();
 
     expect($modelResult->id)->toEqual($testModel->id);
+
+    $modelResult = createQueryFromFilterCollection([
+            'custom_name' => $testModel->name,
+        ])
+        ->allowedFilters(AllowedFilter::custom('custom_name', $filterClass))
+        ->first();
+
+    expect($modelResult->id)->toEqual($testModel->id);
 });
 
 it('can allow multiple filters', function () {
@@ -367,6 +537,15 @@ it('can allow multiple filters', function () {
 
     expect($results)->toHaveCount(2);
     expect($results->pluck('id')->all())->toEqual([$model1->id, $model2->id]);
+
+    $results = createQueryFromFilterCollection([
+            'name' => 'abc',
+        ])
+        ->allowedFilters('name', AllowedFilter::exact('id'))
+        ->get();
+
+    expect($results)->toHaveCount(2);
+    expect($results->pluck('id')->all())->toEqual([$model1->id, $model2->id]);
 });
 
 it('can allow multiple filters as an array', function () {
@@ -374,6 +553,15 @@ it('can allow multiple filters as an array', function () {
     $model2 = TestModel::create(['name' => 'abcdef']);
 
     $results = createQueryFromFilterRequest([
+            'name' => 'abc',
+        ])
+        ->allowedFilters(['name', AllowedFilter::exact('id')])
+        ->get();
+
+    expect($results)->toHaveCount(2);
+    expect($results->pluck('id')->all())->toEqual([$model1->id, $model2->id]);
+
+    $results = createQueryFromFilterCollection([
             'name' => 'abc',
         ])
         ->allowedFilters(['name', AllowedFilter::exact('id')])
@@ -396,6 +584,16 @@ it('can filter by multiple filters', function () {
 
     expect($results)->toHaveCount(1);
     expect($results->pluck('id')->all())->toEqual([$model1->id]);
+
+    $results = createQueryFromFilterCollection([
+            'name' => 'abc',
+            'id' => "1,{$model1->id}",
+        ])
+        ->allowedFilters('name', AllowedFilter::exact('id'))
+        ->get();
+
+    expect($results)->toHaveCount(1);
+    expect($results->pluck('id')->all())->toEqual([$model1->id]);
 });
 
 it('guards against invalid filters', function () {
@@ -403,12 +601,20 @@ it('guards against invalid filters', function () {
 
     createQueryFromFilterRequest(['name' => 'John'])
         ->allowedFilters('id');
+
+    createQueryFromFilterCollection(['name' => 'John'])
+        ->allowedFilters('id');
 });
 
 it('does not throw invalid filter exception when disable in config', function () {
     config(['query-builder.disable_invalid_filter_query_exception' => true]);
 
     createQueryFromFilterRequest(['name' => 'John'])
+        ->allowedFilters('id');
+
+    expect(true)->toBeTrue();
+
+    createQueryFromFilterCollection(['name' => 'John'])
         ->allowedFilters('id');
 
     expect(true)->toBeTrue();
@@ -433,6 +639,14 @@ it('can create a custom filter with an instantiated filter', function () {
     TestModel::create(['name' => 'abcdef']);
 
     $results = createQueryFromFilterRequest([
+            '*' => '*',
+        ])
+        ->allowedFilters('name', AllowedFilter::custom('*', $customFilter))
+        ->get();
+
+    $this->assertNotEmpty($results);
+
+    $results = createQueryFromFilterCollection([
             '*' => '*',
         ])
         ->allowedFilters('name', AllowedFilter::custom('*', $customFilter))
@@ -469,6 +683,14 @@ it('should not apply a filter if the supplied value is ignored', function () {
         ->get();
 
     expect($models)->toHaveCount(TestModel::count());
+
+    $models = createQueryFromFilterCollection([
+            'name' => '-1',
+        ])
+        ->allowedFilters(AllowedFilter::exact('name')->ignore('-1'))
+        ->get();
+
+    expect($models)->toHaveCount(TestModel::count());
 });
 
 it('should apply the filter on the subset of allowed values', function () {
@@ -482,6 +704,14 @@ it('should apply the filter on the subset of allowed values', function () {
         ->get();
 
     expect($models)->toHaveCount(1);
+
+    $models = createQueryFromFilterCollection([
+            'name' => 'John Deer,John Doe',
+        ])
+        ->allowedFilters(AllowedFilter::exact('name')->ignore('John Doe'))
+        ->get();
+
+    expect($models)->toHaveCount(1);
 });
 
 it('should apply the filter on the subset of allowed values regardless of the keys order', function () {
@@ -489,6 +719,14 @@ it('should apply the filter on the subset of allowed values regardless of the ke
     TestModel::create(['id' => 7, 'name' => 'John Deer']);
 
     $models = createQueryFromFilterRequest([
+            'id' => [ 7, 6 ],
+        ])
+        ->allowedFilters(AllowedFilter::exact('id')->ignore(6))
+        ->get();
+
+    expect($models)->toHaveCount(1);
+
+    $models = createQueryFromFilterCollection([
             'id' => [ 7, 6 ],
         ])
         ->allowedFilters(AllowedFilter::exact('id')->ignore(6))
@@ -522,6 +760,14 @@ it('resolves queries using property column name', function () {
         ->get();
 
     expect($models)->toHaveCount(1);
+
+    $models = createQueryFromFilterCollection([
+            'nickname' => 'abcdef',
+        ])
+        ->allowedFilters($filter)
+        ->get();
+
+    expect($models)->toHaveCount(1);
 });
 
 it('can filter using boolean flags', function () {
@@ -534,6 +780,13 @@ it('can filter using boolean flags', function () {
 
     expect($models)->toHaveCount(0);
     expect(TestModel::all()->count())->toBeGreaterThan(0);
+
+    $models = createQueryFromFilterCollection(['is_visible' => 'false'])
+        ->allowedFilters($filter)
+        ->get();
+
+    expect($models)->toHaveCount(0);
+    expect(TestModel::all()->count())->toBeGreaterThan(0);
 });
 
 it('should apply a default filter value if nothing in request', function () {
@@ -541,6 +794,12 @@ it('should apply a default filter value if nothing in request', function () {
     TestModel::create(['name' => 'UniqueJohn Deer']);
 
     $models = createQueryFromFilterRequest([])
+        ->allowedFilters(AllowedFilter::partial('name')->default('UniqueJohn'))
+        ->get();
+
+    expect($models->count())->toEqual(2);
+
+    $models = createQueryFromFilterCollection([])
         ->allowedFilters(AllowedFilter::partial('name')->default('UniqueJohn'))
         ->get();
 
@@ -558,6 +817,14 @@ it('does not apply default filter when filter exists and default is set', functi
         ->get();
 
     expect($models->count())->toEqual(1);
+
+    $models = createQueryFromFilterCollection([
+            'name' => 'UniqueDoe',
+        ])
+        ->allowedFilters(AllowedFilter::partial('name')->default('UniqueJohn'))
+        ->get();
+
+    expect($models->count())->toEqual(1);
 });
 
 it('should apply a null default filter value if nothing in request', function () {
@@ -569,6 +836,12 @@ it('should apply a null default filter value if nothing in request', function ()
         ->get();
 
     expect($models->count())->toEqual(1);
+
+    $models = createQueryFromFilterCollection([])
+        ->allowedFilters(AllowedFilter::exact('name')->default(null))
+        ->get();
+
+    expect($models->count())->toEqual(1);
 });
 
 it('does not apply default filter when filter exists and default null is set', function () {
@@ -576,6 +849,14 @@ it('does not apply default filter when filter exists and default null is set', f
     TestModel::create(['name' => 'UniqueJohn Deer']);
 
     $models = createQueryFromFilterRequest([
+            'name' => 'UniqueJohn Deer',
+        ])
+        ->allowedFilters(AllowedFilter::exact('name')->default(null))
+        ->get();
+
+    expect($models->count())->toEqual(1);
+
+    $models = createQueryFromFilterCollection([
             'name' => 'UniqueJohn Deer',
         ])
         ->allowedFilters(AllowedFilter::exact('name')->default(null))
@@ -595,6 +876,14 @@ it('should apply a nullable filter when filter exists and is null', function () 
         ->get();
 
     expect($models->count())->toEqual(1);
+
+    $models = createQueryFromFilterCollection([
+            'name' => null,
+        ])
+        ->allowedFilters(AllowedFilter::exact('name')->nullable())
+        ->get();
+
+    expect($models->count())->toEqual(1);
 });
 
 it('should apply a nullable filter when filter exists and is set', function () {
@@ -602,6 +891,14 @@ it('should apply a nullable filter when filter exists and is set', function () {
     TestModel::create(['name' => 'UniqueJohn Deer']);
 
     $models = createQueryFromFilterRequest([
+            'name' => 'UniqueJohn Deer',
+        ])
+        ->allowedFilters(AllowedFilter::exact('name')->nullable())
+        ->get();
+
+    expect($models->count())->toEqual(1);
+
+    $models = createQueryFromFilterCollection([
             'name' => 'UniqueJohn Deer',
         ])
         ->allowedFilters(AllowedFilter::exact('name')->nullable())
@@ -621,11 +918,26 @@ it('should filter by query parameters if a default value is set and unset afterw
         ->get();
 
     expect($models->count())->toEqual(1);
+
+    $filterWithDefault = AllowedFilter::exact('name')->default('some default value');
+    $models = createQueryFromFilterCollection([
+            'name' => 'John Doe',
+        ])
+        ->allowedFilters($filterWithDefault->unsetDefault())
+        ->get();
+
+    expect($models->count())->toEqual(1);
 });
 
 it('should not filter at all if a default value is set and unset afterwards', function () {
     $filterWithDefault = AllowedFilter::exact('name')->default('some default value');
     $models = createQueryFromFilterRequest([])
+        ->allowedFilters($filterWithDefault->unsetDefault())
+        ->get();
+
+    expect($models->count())->toEqual(5);
+
+    $models = createQueryFromFilterCollection([])
         ->allowedFilters($filterWithDefault->unsetDefault())
         ->get();
 
@@ -636,6 +948,24 @@ it('should apply a filter with a multi-dimensional array value', function () {
     TestModel::create(['name' => 'John Doe']);
 
     $models = createQueryFromFilterRequest(['conditions' => [[
+            'attribute' => 'name',
+            'operator' => '=',
+            'value' => 'John Doe',
+        ]]])
+        ->allowedFilters(AllowedFilter::callback('conditions', function ($query, $conditions) {
+            foreach ($conditions as $condition) {
+                $query->where(
+                    $condition['attribute'],
+                    $condition['operator'],
+                    $condition['value']
+                );
+            }
+        }))
+        ->get();
+
+    expect($models->count())->toEqual(1);
+
+    $models = createQueryFromFilterCollection(['conditions' => [[
             'attribute' => 'name',
             'operator' => '=',
             'value' => 'John Doe',
@@ -676,6 +1006,30 @@ it('can override the array value delimiter for single filters', function () {
 
     // Custom delimiter, but default in request
     $models = createQueryFromFilterRequest([
+            'ref_id' => 'h4S4MG3(+>azv4z/I<o>,>XZII/Q1On',
+        ])
+        ->allowedFilters(AllowedFilter::exact('ref_id', 'name', true, '|'))
+        ->get();
+    expect($models->count())->toEqual(0);
+
+    // First use default delimiter
+    $models = createQueryFromFilterCollection([
+            'ref_id' => 'h4S4MG3(+>azv4z/I<o>,>XZII/Q1On',
+        ])
+        ->allowedFilters(AllowedFilter::exact('ref_id', 'name', true))
+        ->get();
+    expect($models->count())->toEqual(2);
+
+    // Custom delimiter
+    $models = createQueryFromFilterCollection([
+            'ref_id' => 'h4S4MG3(+>azv4z/I<o>|>XZII/Q1On',
+        ])
+        ->allowedFilters(AllowedFilter::exact('ref_id', 'name', true, '|'))
+        ->get();
+    expect($models->count())->toEqual(2);
+
+    // Custom delimiter, but default in request
+    $models = createQueryFromFilterCollection([
             'ref_id' => 'h4S4MG3(+>azv4z/I<o>,>XZII/Q1On',
         ])
         ->allowedFilters(AllowedFilter::exact('ref_id', 'name', true, '|'))
