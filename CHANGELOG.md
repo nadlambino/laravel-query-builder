@@ -2,6 +2,30 @@
 
 All notable changes to `laravel-query-builder` will be documented in this file
 
+## 7.0.1 - 2024-06-21
+
+### What's Changed
+
+Commit: https://github.com/spatie/laravel-query-builder/commit/f57a0028e60c74eee0116c1632798a999c5aa044
+
+* First, the package namespace was changed to avoid conflict and confusion from the `spatie/laravel-query-builder`.
+* Renamed the `QueryBuilderRequest` to `RequestSource` and move it into the `sources` directory. The namespace were also changed due to moving it to its new location.
+* Created a `CollectionSource` which shares the same methods from the `RequestSource` via `Source` trait. The only difference is how the `getData` (previously `getRequestData`) was implemented.
+* Changing the delimeter can now be done through the source class. Previously, it can be done using the `QueryBuilderRequest`
+
+```php
+/** Previously */
+QueryBuilderRequest::setFilterArrayValueDelimiter('|');
+
+/** Now, when using the request as the source */
+RequestSource::setFilterArrayValueDelimiter('|');
+
+/** Or when using the array/collection as the source */
+CollectionSource::setFilterArrayValueDelimiter('|');
+```
+
+**Full Changelog**: https://github.com/spatie/laravel-query-builder/compare/6.0.1...7.0.1
+
 ## 6.0.1 - 2024-05-21
 
 ### What's Changed
