@@ -2,6 +2,7 @@
     "name": "nadlambino/laravel-query-builder",
     "description": "This is a forked of spatie/laravel-query-builder but decoupled the builder from request.",
     "keywords": [
+        "spatie",
         "nadlambino",
         "laravel-query-builder"
     ],
@@ -12,6 +13,12 @@
         "source": "https://github.com/nadlambino/laravel-query-builder"
     },
     "authors": [
+        {
+            "name": "Alex Vanderbist",
+            "email": "alex@spatie.be",
+            "homepage": "https://spatie.be",
+            "role": "Developer"
+        },
         {
             "name": "Ronald Lambino",
             "email": "ronaldlambino0000@gmail.com",
