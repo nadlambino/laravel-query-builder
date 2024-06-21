@@ -1,3 +1,23 @@
+# What is the goal for forking this package?
+The goal is to allow the `QueryBuilder` class to not be tightly coupled from the request object. The package should be able to use outside of the context of API request, write a single query builder that can be use with API and in any other part of the application where the filters are not from the request.
+
+# What are the changes?
+- First, the package namespace was changed to avoid conflict and confusion from the `spatie/laravel-query-builder`.
+- Renamed the `QueryBuilderRequest` to `RequestSource` and move it into the `sources` directory. The namespace were also changed due to moving it to its new location.
+- Created a `CollectionSource` which shares the same methods from the `RequestSource` via `Source` trait. The only difference is how the `getData` (previously `getRequestData`) was implemented.
+- Changing the delimeter can now be done through the source class. Previously, it can be done using the `QueryBuilderRequest`
+
+```php
+/** Previously */
+QueryBuilderRequest::setFilterArrayValueDelimiter('|');
+
+/** Now, when using the request as the source */
+RequestSource::setFilterArrayValueDelimiter('|');
+
+/** Or when using the array/collection as the source */
+CollectionSource::setFilterArrayValueDelimiter('|');
+```
+
 # Build Eloquent queries from API requests
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-query-builder.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-query-builder)
