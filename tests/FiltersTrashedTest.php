@@ -20,10 +20,26 @@ it('should filter not trashed by default', function () {
         ->get();
 
     expect($models)->toHaveCount(2);
+
+    $models = createQueryFromFilterCollection([
+            'trashed' => '',
+        ])
+        ->allowedFilters(AllowedFilter::trashed())
+        ->get();
+
+    expect($models)->toHaveCount(2);
 })->skip();
 
 it('can filter only trashed', function () {
     $models = createQueryFromFilterRequest([
+            'trashed' => 'only',
+        ], SoftDeleteModel::class)
+        ->allowedFilters(AllowedFilter::trashed())
+        ->get();
+
+    expect($models)->toHaveCount(1);
+
+    $models = createQueryFromFilterCollection([
             'trashed' => 'only',
         ], SoftDeleteModel::class)
         ->allowedFilters(AllowedFilter::trashed())
@@ -40,10 +56,26 @@ it('can filter only trashed by scope directly', function () {
         ->get();
 
     expect($models)->toHaveCount(1);
+
+    $models = createQueryFromFilterCollection([
+            'only_trashed' => true,
+        ], SoftDeleteModel::class)
+        ->allowedFilters(AllowedFilter::scope('only_trashed'))
+        ->get();
+
+    expect($models)->toHaveCount(1);
 });
 
 it('can filter with trashed', function () {
     $models = createQueryFromFilterRequest([
+            'trashed' => 'with',
+        ], SoftDeleteModel::class)
+        ->allowedFilters(AllowedFilter::trashed())
+        ->get();
+
+    expect($models)->toHaveCount(3);
+
+    $models = createQueryFromFilterCollection([
             'trashed' => 'with',
         ], SoftDeleteModel::class)
         ->allowedFilters(AllowedFilter::trashed())
