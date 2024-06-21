@@ -15,8 +15,6 @@ use NadLambino\QueryBuilder\Filters\Filter as CustomFilter;
 use NadLambino\QueryBuilder\Filters\Filter as FilterInterface;
 use NadLambino\QueryBuilder\Filters\FiltersExact;
 use NadLambino\QueryBuilder\QueryBuilder;
-use NadLambino\QueryBuilder\Sources\CollectionSource;
-use NadLambino\QueryBuilder\Sources\RequestSource;
 use NadLambino\QueryBuilder\Tests\TestClasses\Models\TestModel;
 
 beforeEach(function () {
