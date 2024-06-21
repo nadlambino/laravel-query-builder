@@ -21,6 +21,14 @@ it('can filter related model property', function () {
         ->get();
 
     expect($models)->toHaveCount(1);
+
+    $models = createQueryFromFilterCollection([
+            'relatedModels.name' => $this->models->first()->name,
+        ])
+        ->allowedFilters('relatedModels.name')
+        ->get();
+
+    expect($models)->toHaveCount(1);
 });
 
 it('can filter results based on the partial existence of a property in an array', function () {
@@ -42,6 +50,14 @@ it('can filter models and return an empty collection', function () {
         ->get();
 
     expect($models)->toHaveCount(0);
+
+    $models = createQueryFromFilterCollection([
+            'relatedModels.name' => 'None existing first name',
+        ])
+        ->allowedFilters('relatedModels.name')
+        ->get();
+
+    expect($models)->toHaveCount(0);
 });
 
 it('can filter related nested model property', function () {
@@ -52,10 +68,27 @@ it('can filter related nested model property', function () {
         ->get();
 
     expect($models)->toHaveCount(5);
+
+    $models = createQueryFromFilterCollection([
+            'relatedModels.nestedRelatedModels.name' => 'test',
+        ])
+        ->allowedFilters('relatedModels.nestedRelatedModels.name')
+        ->get();
+
+    expect($models)->toHaveCount(5);
 });
 
 it('can filter related model and related nested model property', function () {
     $models = createQueryFromFilterRequest([
+            'relatedModels.name' => $this->models->first()->name,
+            'relatedModels.nestedRelatedModels.name' => 'test',
+        ])
+        ->allowedFilters('relatedModels.name', 'relatedModels.nestedRelatedModels.name')
+        ->get();
+
+    expect($models)->toHaveCount(1);
+
+    $models = createQueryFromFilterCollection([
             'relatedModels.name' => $this->models->first()->name,
             'relatedModels.nestedRelatedModels.name' => 'test',
         ])
@@ -78,12 +111,32 @@ it('can filter results based on the existence of a property in an array', functi
 
     expect($results)->toHaveCount(2);
     expect($results->pluck('id')->all())->toEqual([1, 2]);
+
+
+    $results = createQueryFromFilterCollection([
+            'relatedModels.id' => $testModels->map(function ($model) {
+                return $model->relatedModels->pluck('id');
+            })->flatten()->all(),
+        ])
+        ->allowedFilters(AllowedFilter::exact('relatedModels.id'))
+        ->get();
+
+    expect($results)->toHaveCount(2);
+    expect($results->pluck('id')->all())->toEqual([1, 2]);
 });
 
 it('can filter and reject results by exact property', function () {
     $testModel = TestModel::create(['name' => 'John Testing Doe']);
 
     $modelsResult = createQueryFromFilterRequest([
+            'relatedModels.nestedRelatedModels.name' => ' test ',
+        ])
+        ->allowedFilters(AllowedFilter::exact('relatedModels.nestedRelatedModels.name'))
+        ->get();
+
+    expect($modelsResult)->toHaveCount(0);
+
+    $modelsResult = createQueryFromFilterCollection([
             'relatedModels.nestedRelatedModels.name' => ' test ',
         ])
         ->allowedFilters(AllowedFilter::exact('relatedModels.nestedRelatedModels.name'))
@@ -102,12 +155,28 @@ it('can disable exact filtering based on related model properties', function () 
         ->toSql();
 
     expect($sql)->toContain('`relatedModels`.`name` = ');
+
+    $sql = createQueryFromFilterCollection([
+            'relatedModels.name' => $this->models->first()->name,
+        ])
+        ->allowedFilters(AllowedFilter::exact('relatedModels.name', null, $addRelationConstraint))
+        ->toSql();
+
+    expect($sql)->toContain('`relatedModels`.`name` = ');
 });
 
 it('can disable partial filtering based on related model properties', function () {
     $addRelationConstraint = false;
 
     $sql = createQueryFromFilterRequest([
+            'relatedModels.name' => $this->models->first()->name,
+        ])
+        ->allowedFilters(AllowedFilter::partial('relatedModels.name', null, $addRelationConstraint))
+        ->toSql();
+
+    expect($sql)->toContain('LOWER(`relatedModels`.`name`) LIKE ?');
+
+    $sql = createQueryFromFilterCollection([
             'relatedModels.name' => $this->models->first()->name,
         ])
         ->allowedFilters(AllowedFilter::partial('relatedModels.name', null, $addRelationConstraint))
